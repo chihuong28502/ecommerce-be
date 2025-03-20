@@ -1,6 +1,6 @@
+import { ApiKey } from '@/api-key/schemas/api-key.schema';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Injectable, Logger } from '@nestjs/common';
-import { ApiKey } from 'src/api-key/schemas/api-key.schema';
 import { ApiKeyService } from '../api-key/api-key.service';
 import { geminiConfig } from '../config/gemini.config';
 

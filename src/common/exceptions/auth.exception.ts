@@ -1,6 +1,6 @@
 import { ConflictException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 
-// src/common/exceptions/auth.exception.ts
+// @/common/exceptions/auth.exception.ts
 export class InvalidCredentialsException extends UnauthorizedException {
   constructor() {
     super('Email hoặc mật khẩu không chính xác');
