@@ -11,6 +11,13 @@ import { AuthModule } from './auth/auth.module';
 import { GeminiModule } from './gemini/gemini.module';
 import { RedisModule } from './redis/redis.module';
 import { UsersModule } from './user/user.module';
+import { ProductModule } from './product/product.module';
+import { CategoryModule } from './category/category.module';
+import { CartModule } from './cart/cart.module';
+import { ReviewModule } from './review/review.module';
+import { WishlistModule } from './wishlist/wishlist.module';
+import { NotificationModule } from './notification/notification.module';
+import { SettingModule } from './setting/setting.module';
 
 
 @Module({
@@ -42,6 +49,13 @@ import { UsersModule } from './user/user.module';
     AuthModule,
     UsersModule,
     ApiKeyModule,
+    ProductModule,
+    CategoryModule,
+    CartModule,
+    ReviewModule,
+    WishlistModule,
+    NotificationModule,
+    SettingModule,
   ],
   providers: [AppService,],
   controllers: [AppController],

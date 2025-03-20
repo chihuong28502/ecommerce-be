@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { CreateApiKeyDto } from './dto/create-api-key.dto';
-import { ApiKey } from './schema/api-key.schema';
+import { ApiKey } from './schemas/api-key.schema';
 
 @Injectable()
 export class ApiKeyService {
