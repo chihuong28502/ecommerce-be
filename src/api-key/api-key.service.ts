@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { CreateApiKeyDto } from './dto/create-api-key.dto';
+import { CreateApiKeyDto, CreateArrApiKeyDto } from './dto/create-api-key.dto';
 import { ApiKey } from './schemas/api-key.schema';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class ApiKeyService {
   constructor(
     @InjectModel(ApiKey.name)
     private readonly apiKeyModel: Model<ApiKey>,
-  ) {}
+  ) { }
 
   async getNextApiKey(): Promise<ApiKey[]> {
     const now = new Date();
@@ -270,6 +270,37 @@ export class ApiKeyService {
 
   // CRUD operations
   async create(createApiKeyDto: CreateApiKeyDto): Promise<ApiKey> {
+    const createdApiKey = new this.apiKeyModel({
+      key: createApiKeyDto.key,
+      status: true,
+      usageCount: 0,
+      lastUsedAt: null,
+      lastCheckedAt: null,
+      minuteRequests: [],
+      dailyRequests: [],
+    });
+    return createdApiKey.save();
+  }
+  async createMulti(createArrApiKeyDto: CreateArrApiKeyDto): Promise<ApiKey[]> {
+    // Giả sử createArrApiKeyDto.keys là một mảng các chuỗi key
+    const createdApiKeys = await Promise.all(
+      createArrApiKeyDto.keys.map(async (key) => {
+        const newApiKey = new this.apiKeyModel({
+          key: key,
+          status: true,
+          usageCount: 0,
+          lastUsedAt: null,
+          lastCheckedAt: null,
+          minuteRequests: [],
+          dailyRequests: [],
+        });
+        return newApiKey.save();
+      })
+    );
+    return createdApiKeys;
+  }
+
+  async createArrApiKeyDto(createApiKeyDto: CreateApiKeyDto): Promise<ApiKey> {
     const createdApiKey = new this.apiKeyModel({
       key: createApiKeyDto.key,
       status: true,

@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { CartModule } from './cart/cart.module';
 import { CategoryModule } from './category/category.module';
 import { GeminiModule } from './gemini/gemini.module';
+import { HealthModule } from './health/health.module';
 import { NotificationModule } from './notification/notification.module';
 import { ProductModule } from './product/product.module';
 import { RedisModule } from './redis/redis.module';
@@ -56,6 +57,7 @@ import { WishlistModule } from './wishlist/wishlist.module';
     WishlistModule,
     NotificationModule,
     SettingModule,
+    HealthModule,
   ],
   providers: [AppService],
   controllers: [AppController]

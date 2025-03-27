@@ -7,3 +7,8 @@ export class CreateApiKeyDto {
   @IsNotEmpty()
   key: string;
 }
+export class CreateArrApiKeyDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  keys: [string];
+}
