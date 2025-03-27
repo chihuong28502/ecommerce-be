@@ -310,4 +310,21 @@ export class CategoryService {
       await this.updateChildLevels(child._id, newLevel);
     }
   }
+  
+  //
+  // Lấy danh mục theo ID
+  async findLevelById(id: string): Promise<Category> {
+    try {
+      const category = await this.categoryModel.findById(id).select('level slug').exec();
+      if (!category) {
+        throw new NotFoundException(`Không tìm thấy danh mục với ID ${id}`);
+      }
+      return category;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(`Không thể lấy danh mục: ${error.message}`);
+    }
+  }
 }
