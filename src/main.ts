@@ -10,37 +10,33 @@ import { TransformInterceptor } from './common/Interceptors/response.interceptor
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+  
+  app.use(helmet());
+  app.use(morgan('dev'));
+  
+  const reflector = app.get(Reflector);
+  app.useGlobalInterceptors(new TransformInterceptor(reflector));
 
-  // Thêm TransformInterceptor global
-  app.useGlobalInterceptors(new TransformInterceptor(new Reflector()));
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    })
-  );
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }));
 
   const config = new DocumentBuilder()
-    .setTitle('Store example')
-    .setDescription('The Store API description')
-    .setVersion('1.0')
-    .addTag('Store')
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, documentFactory);
+    .setTitle('Store API').setDescription('The Store API description')
+    .addTag('Store').build();
 
-  app.use(cookieParser());
-  const configService = app.get(ConfigService);
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
+
+  app.use(cookieParser());  
+
+  const corsOrigins = configService.get<string>('CORS_ORIGIN', '');
+  const allowedOrigins = corsOrigins ? corsOrigins.split(',') : '*';
   app.enableCors({
-    origin: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    origin: allowedOrigins.length > 1 ? allowedOrigins : allowedOrigins[0],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
-  app.use(morgan('dev'));
-
-  app.use(helmet());
 
   await app.listen(configService.get<string>('PORT', '1001'));
 

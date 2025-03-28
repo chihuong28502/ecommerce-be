@@ -1,17 +1,17 @@
 import { ResponseMessage } from '@/common/decorators/response.decorator';
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Patch,
+    Post
 } from '@nestjs/common';
 import {
-  ApiOperation,
-  ApiResponse,
-  ApiTags
+    ApiOperation,
+    ApiResponse,
+    ApiTags
 } from '@nestjs/swagger';
 import { CreateVariantDto, UpdateVariantDto } from './dto/product.dto';
 import { Variant } from './schemas/variant.schema';
@@ -24,7 +24,7 @@ export class VariantController {
 
   @Post()
   // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(Role.ADMIN)
+  // @Roles(ROLE.ADMIN)
   @ResponseMessage('Tạo biến thể thành công')
   @ApiOperation({ summary: 'Tạo biến thể mới' })
   @ApiResponse({ status: 201, description: 'Biến thể đã được tạo' })
@@ -42,7 +42,7 @@ export class VariantController {
 
   @Patch(':id')
   // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(Role.ADMIN)
+  // @Roles(ROLE.ADMIN)
   @ResponseMessage('Cập nhật biến thể thành công')
   @ApiOperation({ summary: 'Cập nhật biến thể' })
   @ApiResponse({ status: 200, description: 'Biến thể đã được cập nhật' })
@@ -55,7 +55,7 @@ export class VariantController {
 
   @Delete(':id')
   // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(Role.ADMIN)
+  // @Roles(ROLE.ADMIN)
   @ResponseMessage('Xóa biến thể thành công')
   @ApiOperation({ summary: 'Xóa biến thể' })
   @ApiResponse({ status: 200, description: 'Biến thể đã được xóa' })
@@ -65,7 +65,7 @@ export class VariantController {
 
   @Patch(':id/stock')
   // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(Role.ADMIN)
+  // @Roles(ROLE.ADMIN)
   @ResponseMessage('Cập nhật tồn kho biến thể thành công')
   @ApiOperation({ summary: 'Cập nhật tồn kho biến thể' })
   @ApiResponse({ status: 200, description: 'Tồn kho biến thể đã được cập nhật' })

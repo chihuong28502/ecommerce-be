@@ -1,7 +1,7 @@
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { ResponseMessage } from '@/common/decorators/response.decorator';
 import { Roles } from '@/common/decorators/roles.decorator';
-import { Role } from '@/common/enums/role.enum';
+import { ROLE } from '@/common/enums/role.enum';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import {
@@ -32,7 +32,7 @@ export class ProductController {
 
   @Post()
   // @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(ROLE.ADMIN)
   @ResponseMessage('Tạo sản phẩm thành công')
   @ApiOperation({ summary: 'Tạo sản phẩm mới' })
   @ApiResponse({ status: 201, description: 'Sản phẩm đã được tạo' })
@@ -77,7 +77,7 @@ export class ProductController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(ROLE.ADMIN)
   @ResponseMessage('Cập nhật sản phẩm thành công')
   @ApiOperation({ summary: 'Cập nhật sản phẩm' })
   @ApiResponse({ status: 200, description: 'Sản phẩm đã được cập nhật' })
@@ -91,7 +91,7 @@ export class ProductController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(ROLE.ADMIN)
   @ResponseMessage('Xóa sản phẩm thành công')
   @ApiOperation({ summary: 'Xóa sản phẩm' })
   @ApiResponse({ status: 200, description: 'Sản phẩm đã được xóa' })

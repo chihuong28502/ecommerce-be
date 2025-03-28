@@ -1,5 +1,5 @@
 // @/modules/users/schemas/user.schema.ts
-import { Role } from '@/common/enums/role.enum';
+import { ROLE } from '@/common/enums/role.enum';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -22,8 +22,8 @@ export class User {
   @Prop({ default: true })
   isActive: boolean;
 
-  @Prop({ type: [String], enum: Role, default: [Role.USER] })
-  roles: Role[];
+  @Prop({ type: String, enum: ROLE, default: ROLE.USER })
+  role: ROLE;
 
   @Prop()
   avatar?: string;

@@ -1,7 +1,7 @@
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { ResponseMessage } from '@/common/decorators/response.decorator';
 import { Roles } from '@/common/decorators/roles.decorator';
-import { Role } from '@/common/enums/role.enum';
+import { ROLE } from '@/common/enums/role.enum';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
 import { Controller, Get, UseGuards } from '@nestjs/common';
@@ -20,7 +20,7 @@ export class UsersController {
 
   @Get('admin-only')
   @ResponseMessage('Lấy nội dung admin thành công')
-  @Roles(Role.ADMIN)
+  @Roles(ROLE.ADMIN)
   getAdminOnly() {
     return { message: 'This is admin only content' };
   }

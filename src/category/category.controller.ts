@@ -1,3 +1,4 @@
+import { ROLE } from '@/common/enums/role.enum';
 import {
   Body,
   Controller,
@@ -12,7 +13,6 @@ import {
 import { Public } from '../common/decorators/public.decorator';
 import { ResponseMessage } from '../common/decorators/response.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../common/enums/role.enum';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CategoryService } from './category.service';
@@ -24,7 +24,7 @@ export class CategoryController {
 
   @Post()
   // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(Role.ADMIN)
+  // @Roles(ROLE.ADMIN)
   @ResponseMessage('Tạo danh mục thành công')
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
@@ -88,7 +88,7 @@ export class CategoryController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(ROLE.ADMIN)
   @ResponseMessage('Cập nhật danh mục thành công')
   update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoryService.update(id, updateCategoryDto);
@@ -96,7 +96,7 @@ export class CategoryController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(ROLE.ADMIN)
   @ResponseMessage('Xóa danh mục thành công')
   remove(@Param('id') id: string) {
     return this.categoryService.remove(id);
