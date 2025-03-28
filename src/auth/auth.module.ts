@@ -1,3 +1,4 @@
+import { CartModule } from '@/cart/cart.module';
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -13,6 +14,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 @Module({
   imports: [
     UsersModule,
+    CartModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

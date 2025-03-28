@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
+import { CartService } from '@/cart/cart.service';
 import { UserDocument } from '@/user/schemas/user.schema';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
@@ -21,6 +22,7 @@ export class AuthService {
   constructor(
     // @InjectQueue('send-email')
     private usersService: UsersService,
+    private cartService: CartService,
     private configService: ConfigService,
     private jwtService: JwtService,
     @InjectQueue('send-email')
@@ -130,14 +132,16 @@ export class AuthService {
         );
       }
       // Tạo user mới
-      const newUser = await this.usersService.create({
+      const newUser: UserDocument = await this.usersService.create({
         ...registerDto,
         email: registerDto.email,
         password: hashedPassword
-      });
-
+      })
+      if (!newUser || !newUser._id) {
+        throw new InternalServerErrorException('Có lỗi xảy ra khi tạo người dùng hoặc không có _id hợp lệ',);
+      }
+      await this.cartService.createCartForUser(newUser._id.toString());
       const url = this.generateUrlVerificationToken(registerDto.email);
-
       await this.sendMail.add('register', { email: registerDto.email, verificationUrl: url },
         { removeOnComplete: true });
       return newUser.toObject()
@@ -154,7 +158,7 @@ export class AuthService {
     }
   }
 
-  async refreshToken(token: any):Promise<{ accessToken: string }> {
+  async refreshToken(token: any): Promise<{ accessToken: string }> {
     try {
       // Kiểm tra token có tồn tại không
       if (!token) {

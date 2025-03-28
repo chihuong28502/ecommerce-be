@@ -1,15 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCartDto } from './dto/create-cart.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { UpdateCartDto } from './dto/update-cart.dto';
+import { Cart, CartDocument } from './schemas/cart.schema';
 
 @Injectable()
 export class CartService {
-  create(createCartDto: CreateCartDto) {
-    return 'This action adds a new cart';
+  constructor(
+    @InjectModel(Cart.name) private cartModel: Model<CartDocument>
+  ) { }
+  async createCartForUser(userId: string): Promise<Cart> {
+    const newCart = new this.cartModel({
+      userId: userId,
+      items: [],
+    });
+    return await newCart.save();
   }
-
-  findAll() {
-    return `This action returns all cart`;
+  async findAll() {
+    return await this.cartModel.find().populate('userId').exec();
   }
 
   findOne(id: number) {
