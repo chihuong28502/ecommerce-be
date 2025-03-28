@@ -225,12 +225,8 @@ export class UsersService implements OnModuleInit {
     return filteredUser
   }
 
-  async activateAccount(email: string) {
+  async activateAccount(email: string):Promise<{success: boolean}> {
     await this.userModel.findOneAndUpdate({ email }, { isActive: true });
-    return {
-      message: 'Khởi động tài khoản thành công',
-      success: true,
-      data: null
-    };
+    return { success: true }
   }
 }

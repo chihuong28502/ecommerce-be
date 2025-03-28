@@ -189,7 +189,7 @@ export class ProductService {
    * @param id ID sản phẩm
    * @returns Thông báo xóa
    */
-  async remove(id: string): Promise<{ message: string }> {
+  async remove(id: string): Promise<{ success: boolean }> {
     const session = await this.productModel.startSession();
     session.startTransaction();
 
@@ -213,8 +213,7 @@ export class ProductService {
 
       // Commit transaction
       await session.commitTransaction();
-
-      return { message: 'Xóa sản phẩm thành công' };
+      return { success: true }
 
     } catch (error) {
       // Rollback transaction

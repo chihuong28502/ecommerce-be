@@ -20,6 +20,7 @@ import { ReviewModule } from './review/review.module';
 import { SettingModule } from './setting/setting.module';
 import { UsersModule } from './user/user.module';
 import { WishlistModule } from './wishlist/wishlist.module';
+import { UploadModule } from './upload/upload.module';
 
 
 @Module({
@@ -79,6 +80,7 @@ import { WishlistModule } from './wishlist/wishlist.module';
     NotificationModule,
     SettingModule,
     HealthModule,
+    UploadModule,
   ],
   providers: [AppService],
   controllers: [AppController]

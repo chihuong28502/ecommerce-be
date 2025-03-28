@@ -1,25 +1,15 @@
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { Public } from '@/common/decorators/public.decorator';
 import { ResponseMessage } from '@/common/decorators/response.decorator';
-import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/decorators/roles.decorator';
 import { ROLE } from '@/common/enums/role.enum';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
-import { RolesGuard } from '@/common/guards/roles.guard';
+import { RoleGuard } from '@/common/guards/roles.guard';
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards
+  Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards
 } from '@nestjs/common';
 import {
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-  ApiTags
+  ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { Product } from './schemas/product.schema';
@@ -27,12 +17,12 @@ import { ProductService } from './service/product.service';
 
 @ApiTags('Products')
 @Controller('products')
+@UseGuards(JwtAuthGuard, RoleGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) { }
 
   @Post()
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(ROLE.ADMIN)
+  @Role(ROLE.ADMIN)
   @ResponseMessage('Tạo sản phẩm thành công')
   @ApiOperation({ summary: 'Tạo sản phẩm mới' })
   @ApiResponse({ status: 201, description: 'Sản phẩm đã được tạo' })
@@ -43,6 +33,7 @@ export class ProductController {
     return this.productService.create(createProductDto, user);
   }
 
+  @Public()
   @Get()
   @ResponseMessage('Lấy danh sách sản phẩm thành công')
   @ApiOperation({ summary: 'Lấy danh sách sản phẩm' })
@@ -59,6 +50,7 @@ export class ProductController {
   }
 
 
+  @Public()
   @Get(':id')
   @ResponseMessage('Lấy chi tiết sản phẩm thành công')
   @ApiOperation({ summary: 'Lấy chi tiết sản phẩm theo ID' })
@@ -67,6 +59,7 @@ export class ProductController {
     return this.productService.findOne(id);
   }
 
+  @Public()
   @Get('slug/:slug')
   @ResponseMessage('Lấy chi tiết sản phẩm theo slug thành công')
   @ApiOperation({ summary: 'Lấy chi tiết sản phẩm theo slug' })
@@ -76,8 +69,7 @@ export class ProductController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(ROLE.ADMIN)
+  @Role(ROLE.ADMIN)
   @ResponseMessage('Cập nhật sản phẩm thành công')
   @ApiOperation({ summary: 'Cập nhật sản phẩm' })
   @ApiResponse({ status: 200, description: 'Sản phẩm đã được cập nhật' })
@@ -90,17 +82,17 @@ export class ProductController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(ROLE.ADMIN)
+  @Role(ROLE.ADMIN)
   @ResponseMessage('Xóa sản phẩm thành công')
   @ApiOperation({ summary: 'Xóa sản phẩm' })
   @ApiResponse({ status: 200, description: 'Sản phẩm đã được xóa' })
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string): Promise<{ success: boolean }> {
     return this.productService.remove(id);
   }
 
   @Get(":id/products")
-  async getProductsByCategory(@Param("id") id: string) {
+  @ResponseMessage('Lấy sản phẩm thành công')
+  async getProductsByCategory(@Param("id") id: string): Promise<Product[]> {
     return this.productService.getProductsByCategory(id);
   }
 }

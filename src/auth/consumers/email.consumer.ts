@@ -19,4 +19,12 @@ export class EmailConsumer {
       throw error;
     }
   }
+  @Process('send-info-o2')
+  async sendInfoO2(job: Job<{ email: string; password: string }>) {
+    try {
+       await this.emailService.sendInfoUserO2(job.data.email, job.data.password);
+    } catch (error) {
+      throw error;
+    }
+  }
 }

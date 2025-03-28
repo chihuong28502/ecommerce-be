@@ -1,7 +1,10 @@
+import { CartModule } from '@/cart/cart.module';
+import { User, UserSchema } from '@/user/schemas/user.schema';
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
@@ -12,7 +15,9 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     UsersModule,
+    CartModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
