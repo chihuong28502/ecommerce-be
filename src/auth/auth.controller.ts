@@ -66,7 +66,7 @@ export class AuthController {
     @Body() registerDto: RegisterDto,
     @Res({ passthrough: true }) res: Response
   ): Promise<LoginResponse> {
-    const existingUser = await this.authService.findByEmail(registerDto.email);
+    const existingUser = await this.authService.findByEmailByRegister(registerDto.email);
 
     if (existingUser) {
       throw new ConflictException('Email đã tồn tại trong hệ thống');

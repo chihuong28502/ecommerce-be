@@ -85,12 +85,11 @@ export class AuthService {
     }
   }
 
-  async findByEmail(email: string) {
+  async findByEmailByRegister(email: string) {
     try {
       if (!email) {
         throw new BadRequestException('Email không được để trống');
       }
-
       const user = await this.usersService.findByEmail(email).catch((error) => {
         if (error instanceof NotFoundException) {
           return null;
