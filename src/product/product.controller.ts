@@ -6,21 +6,10 @@ import { ROLE } from '@/common/enums/role.enum';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RoleGuard } from '@/common/guards/roles.guard';
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards
+  Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards
 } from '@nestjs/common';
 import {
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-  ApiTags
+  ApiOperation, ApiQuery, ApiResponse, ApiTags
 } from '@nestjs/swagger';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { Product } from './schemas/product.schema';
@@ -62,7 +51,6 @@ export class ProductController {
 
 
   @Public()
-  
   @Get(':id')
   @ResponseMessage('Lấy chi tiết sản phẩm thành công')
   @ApiOperation({ summary: 'Lấy chi tiết sản phẩm theo ID' })
@@ -72,7 +60,6 @@ export class ProductController {
   }
 
   @Public()
-  
   @Get('slug/:slug')
   @ResponseMessage('Lấy chi tiết sản phẩm theo slug thành công')
   @ApiOperation({ summary: 'Lấy chi tiết sản phẩm theo slug' })
@@ -104,6 +91,7 @@ export class ProductController {
   }
 
   @Get(":id/products")
+  @ResponseMessage('Lấy sản phẩm thành công')
   async getProductsByCategory(@Param("id") id: string): Promise<Product[]> {
     return this.productService.getProductsByCategory(id);
   }

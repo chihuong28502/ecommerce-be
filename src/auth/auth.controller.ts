@@ -83,16 +83,17 @@ export class AuthController {
   @Public()
   @Post('refresh')
   @ResponseMessage('Làm mới token successfully')
-  async refreshToken(@Req() req: any): Promise<any> {
+  async refreshToken(@Req() req: any): Promise<{ accessToken: string }> {
     const token = req.cookies['refreshToken'];
     return this.authService.refreshToken(token);
   }
 
+  @Public()
   @Get('verify-email')
   @ResponseMessage('Xác thực tài khoản thành công')
   @HttpCode(HttpStatus.OK)
-  async activeAccountByEmail(@Query('token') token: string) {
-    const verifiedEmail = this.authService.verifyToken(token);
+  async activeAccountByEmail(@Query('token') token: string): Promise<{ success: boolean }> {
+    const verifiedEmail = await this.authService.verifyToken(token);
     return await this.userService.activateAccount(verifiedEmail.email);
   }
 }

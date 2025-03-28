@@ -225,10 +225,8 @@ export class UsersService implements OnModuleInit {
     return filteredUser
   }
 
-  async activateAccount(email: string) {
+  async activateAccount(email: string):Promise<{success: boolean}> {
     await this.userModel.findOneAndUpdate({ email }, { isActive: true });
-    return {
-      data: null
-    };
+    return { success: true }
   }
 }

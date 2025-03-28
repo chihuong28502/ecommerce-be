@@ -154,7 +154,7 @@ export class AuthService {
     }
   }
 
-  async refreshToken(token: any) {
+  async refreshToken(token: any):Promise<{ accessToken: string }> {
     try {
       // Kiểm tra token có tồn tại không
       if (!token) {
@@ -199,15 +199,16 @@ export class AuthService {
   }
 
 
-  generateUrlVerificationToken(email: string): string {
-    const hostClient = this.configService.get('NEXT_URL_CLIENT') || "http://localhost:4000";
-    const token = this.jwtService.sign({ email });
+  async generateUrlVerificationToken(email: string): Promise<string> {
+    const hostClient = await this.configService.get('NEXT_URL_CLIENT') || "http://localhost:4000";
+    const token = await this.jwtService.sign({ email });
     const verificationUrl = `${hostClient}/verify-email?token=${token}`;
     return verificationUrl;
   }
-  verifyToken(token: string) {
+
+  async verifyToken(token: string) {
     try {
-      return this.jwtService.verify(token);
+      return await this.jwtService.verify(token);
     } catch (err) {
       throw new UnauthorizedException('Hãy thử yêu cầu lại');
     }
