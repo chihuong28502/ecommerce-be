@@ -1,4 +1,4 @@
-import { GenderEnum, ProductTypeEnum } from '@/enums/enums-product/enums-product';
+import { GenderEnum, ProductTypeEnum } from '@/common/enums/enums-product/enums-product';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,

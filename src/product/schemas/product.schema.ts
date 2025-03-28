@@ -1,5 +1,5 @@
 import { Category } from '@/category/schemas/category.schema';
-import { GenderEnum, ProductTypeEnum } from '@/enums/enums-product/enums-product';
+import { GenderEnum, ProductTypeEnum } from '@/common/enums/enums-product/enums-product';
 import { Review } from '@/product/schemas/review.schema';
 import { Variant } from '@/product/schemas/variant.schema';
 import { User } from '@/user/schemas/user.schema';
