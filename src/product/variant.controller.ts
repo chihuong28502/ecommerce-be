@@ -1,26 +1,26 @@
 import { ResponseMessage } from '@/common/decorators/response.decorator';
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Patch,
-    Post
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post
 } from '@nestjs/common';
 import {
-    ApiOperation,
-    ApiResponse,
-    ApiTags
+  ApiOperation,
+  ApiResponse,
+  ApiTags
 } from '@nestjs/swagger';
 import { CreateVariantDto, UpdateVariantDto } from './dto/product.dto';
 import { Variant } from './schemas/variant.schema';
-import { VariantService } from './variant.service';
+import { VariantService } from './service/variant.service';
 
 @ApiTags('Variants')
 @Controller('variants')
 export class VariantController {
-  constructor(private readonly variantService: VariantService) {}
+  constructor(private readonly variantService: VariantService) { }
 
   @Post()
   // @UseGuards(JwtAuthGuard, RolesGuard)
@@ -47,7 +47,7 @@ export class VariantController {
   @ApiOperation({ summary: 'Cập nhật biến thể' })
   @ApiResponse({ status: 200, description: 'Biến thể đã được cập nhật' })
   async update(
-    @Param('id') id: string, 
+    @Param('id') id: string,
     @Body() updateVariantDto: UpdateVariantDto
   ): Promise<Variant> {
     return this.variantService.update(id, updateVariantDto);
@@ -70,7 +70,7 @@ export class VariantController {
   @ApiOperation({ summary: 'Cập nhật tồn kho biến thể' })
   @ApiResponse({ status: 200, description: 'Tồn kho biến thể đã được cập nhật' })
   async updateStock(
-    @Param('id') id: string, 
+    @Param('id') id: string,
     @Body('quantity') quantity: number
   ): Promise<Variant> {
     return this.variantService.updateStock(id, quantity);

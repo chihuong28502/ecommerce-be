@@ -1,13 +1,12 @@
 import { ApiKeyModule } from '@/api-key/api-key.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { GeminiController } from './gemini.controller';
 import { GeminiService } from './gemini.service';
 import { PromptService } from './prompt.service';
 
 @Module({
   imports: [ConfigModule, ApiKeyModule],
-  controllers: [GeminiController],
+  controllers: [],
   providers: [GeminiService, PromptService],
   exports: [GeminiService, PromptService],
 })

@@ -10,10 +10,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import slugify from 'slugify';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
-import { Product } from './schemas/product.schema';
-import { Review } from './schemas/review.schema';
-import { Variant } from './schemas/variant.schema';
+import { CreateProductDto, UpdateProductDto } from '../dto/product.dto';
+import { Product } from '../schemas/product.schema';
+import { Review } from '../schemas/review.schema';
+import { Variant } from '../schemas/variant.schema';
 
 @Injectable()
 export class ProductService {

@@ -3,12 +3,12 @@ import { Category, CategorySchema } from '@/category/schemas/category.schema';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProductController } from './product.controller';
-import { ProductService } from './product.service';
 import { Product, ProductSchema } from './schemas/product.schema';
 import { Review, ReviewSchema } from './schemas/review.schema';
 import { Variant, VariantSchema } from './schemas/variant.schema';
+import { ProductService } from './service/product.service';
+import { VariantService } from './service/variant.service';
 import { VariantController } from './variant.controller';
-import { VariantService } from './variant.service';
 
 @Module({
   imports: [
