@@ -20,6 +20,7 @@ import { RegisterDto } from './dto/register.dto';
 @Injectable()
 export class AuthService {
   constructor(
+
     // @InjectQueue('send-email')
     private usersService: UsersService,
     private cartService: CartService,
@@ -27,7 +28,9 @@ export class AuthService {
     private jwtService: JwtService,
     @InjectQueue('send-email')
     private sendMail: Queue,
-  ) { }
+  ) {
+
+  }
 
   async validateUser(email: string, password: string): Promise<any> {
     try {
@@ -47,8 +50,7 @@ export class AuthService {
         throw new UnauthorizedException('Email hoặc mật khẩu không chính xác');
       }
 
-      const userObject = user.toObject();
-      const { password: _, ...result } = userObject;
+      const { password: _, ...result } = user.toObject();
       return result;
     } catch (error) {
       if (
@@ -74,13 +76,15 @@ export class AuthService {
         userId: user._id,
         role: user.role,
       };
+      const accessTokenExpiry = this.configService.get<string>('TOKEN_TIME_ACCESS') || '1h';
+      const refreshTokenExpiry = this.configService.get<string>('TOKEN_TIME_REFRESH') || '7d';
 
-      const accessToken = this.jwtService.sign(payload);
+      const accessToken = this.jwtService.sign(payload, { expiresIn: accessTokenExpiry });
 
       if (!accessToken) {
         throw new InternalServerErrorException('Không thể tạo token');
       }
-      const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+      const refreshToken = this.jwtService.sign(payload, { expiresIn: refreshTokenExpiry });
       return {
         accessToken,
         refreshToken,
@@ -180,12 +184,12 @@ export class AuthService {
       }
 
       // Tạo access token mới với thông tin người dùng
+      const accessTokenExpiry = this.configService.get<string>('TOKEN_TIME_ACCESS') || '1h';
       const newAccessToken = this.jwtService.sign({
         email: user.email,
         userId: user._id,
         role: user.role,
-      });
-
+      }, { expiresIn: accessTokenExpiry });
       return { accessToken: newAccessToken };
     } catch (error) {
       // Nếu error là một lỗi đã biết thì chuyển tiếp lỗi đó
@@ -205,7 +209,7 @@ export class AuthService {
 
   async generateUrlVerificationToken(email: string): Promise<string> {
     const hostClient = await this.configService.get('NEXT_URL_CLIENT') || "http://localhost:4000";
-    const token = await this.jwtService.sign({ email });
+    const token = this.jwtService.sign({ email }, { expiresIn: '5m' });
     const verificationUrl = `${hostClient}/verify-email?token=${token}`;
     return verificationUrl;
   }
