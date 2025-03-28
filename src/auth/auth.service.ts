@@ -16,7 +16,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async validateUser(email: string, password: string): Promise<any> {
     try {
@@ -114,13 +114,6 @@ export class AuthService {
       if (!registerDto.email || !registerDto.password) {
         throw new BadRequestException('Email và mật khẩu không được để trống');
       }
-
-      // Kiểm tra email tồn tại
-      const existingUser = await this.findByEmail(registerDto.email);
-      if (existingUser) {
-        throw new ConflictException('Email đã tồn tại trong hệ thống');
-      }
-
       // Hash password
       const hashedPassword = await bcrypt.hash(registerDto.password, 10);
       if (!hashedPassword) {
@@ -128,11 +121,11 @@ export class AuthService {
           'Có lỗi xảy ra khi mã hóa mật khẩu',
         );
       }
-
       // Tạo user mới
       const newUser = await this.usersService.create({
+        ...registerDto,
         email: registerDto.email,
-        password: hashedPassword,
+        password: hashedPassword
       });
 
       const { password, ...result } = newUser.toObject();

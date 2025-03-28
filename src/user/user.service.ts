@@ -53,20 +53,10 @@ export class UsersService implements OnModuleInit {
       if (!createUserDto.email) {
         throw new BadRequestException('Email không được để trống');
       }
-
-      // Kiểm tra email tồn tại
-      const existingUser = await this.userModel.findOne({
-        email: createUserDto.email
-      });
-
-      if (existingUser) {
-        throw new ConflictException('Email đã tồn tại trong hệ thống');
-      }
-
       // Tạo user mới
       const newUser = new this.userModel({
         ...createUserDto,
-        role: [ROLE.USER] // Default role
+        role: ROLE.USER
       });
 
       return await newUser.save();
@@ -181,7 +171,6 @@ export class UsersService implements OnModuleInit {
     }
   }
 
-
   async changePassword(id: string, oldPassword: string, newPassword: string): Promise<void> {
     try {
       if (!id || !oldPassword || !newPassword) {
@@ -227,5 +216,11 @@ export class UsersService implements OnModuleInit {
       }
       throw new InternalServerErrorException('Có lỗi xảy ra khi thêm role');
     }
+  }
+
+  async filterPassword(user) : Promise<UserDocument> {
+    const userObject = user.toObject()
+    const { password, ...filteredUser } = userObject
+    return filteredUser
   }
 }

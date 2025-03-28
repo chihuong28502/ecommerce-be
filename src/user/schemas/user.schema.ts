@@ -24,9 +24,6 @@ export class User {
 
   @Prop({ type: String, enum: ROLE, default: ROLE.USER })
   role: ROLE;
-
-  @Prop()
-  avatar?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

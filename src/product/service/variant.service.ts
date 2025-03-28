@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { CreateVariantDto, UpdateVariantDto } from './dto/product.dto';
-import { Product } from './schemas/product.schema';
-import { Variant } from './schemas/variant.schema';
+import { CreateVariantDto, UpdateVariantDto } from '../dto/product.dto';
+import { Product } from '../schemas/product.schema';
+import { Variant } from '../schemas/variant.schema';
 
 @Injectable()
 export class VariantService {
