@@ -1,4 +1,9 @@
+import { Public } from '@/common/decorators/public.decorator';
 import { ResponseMessage } from '@/common/decorators/response.decorator';
+import { Role } from '@/common/decorators/roles.decorator';
+import { ROLE } from '@/common/enums/role.enum';
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { RoleGuard } from '@/common/guards/roles.guard';
 import {
   Body,
   Controller,
@@ -6,7 +11,8 @@ import {
   Get,
   Param,
   Patch,
-  Post
+  Post,
+  UseGuards
 } from '@nestjs/common';
 import {
   ApiOperation,
@@ -19,12 +25,12 @@ import { VariantService } from './service/variant.service';
 
 @ApiTags('Variants')
 @Controller('variants')
+@UseGuards(JwtAuthGuard, RoleGuard)
 export class VariantController {
   constructor(private readonly variantService: VariantService) { }
 
   @Post()
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(ROLE.ADMIN)
+  @Role(ROLE.ADMIN)
   @ResponseMessage('Tạo biến thể thành công')
   @ApiOperation({ summary: 'Tạo biến thể mới' })
   @ApiResponse({ status: 201, description: 'Biến thể đã được tạo' })
@@ -32,6 +38,8 @@ export class VariantController {
     return this.variantService.create(createVariantDto);
   }
 
+
+  @Public()
   @Get('product/:productId')
   @ResponseMessage('Lấy danh sách biến thể của sản phẩm thành công')
   @ApiOperation({ summary: 'Lấy các biến thể của sản phẩm' })
@@ -41,8 +49,7 @@ export class VariantController {
   }
 
   @Patch(':id')
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(ROLE.ADMIN)
+  @Role(ROLE.ADMIN)
   @ResponseMessage('Cập nhật biến thể thành công')
   @ApiOperation({ summary: 'Cập nhật biến thể' })
   @ApiResponse({ status: 200, description: 'Biến thể đã được cập nhật' })
@@ -54,18 +61,16 @@ export class VariantController {
   }
 
   @Delete(':id')
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(ROLE.ADMIN)
+  @Role(ROLE.ADMIN)
   @ResponseMessage('Xóa biến thể thành công')
   @ApiOperation({ summary: 'Xóa biến thể' })
   @ApiResponse({ status: 200, description: 'Biến thể đã được xóa' })
-  async remove(@Param('id') id: string):Promise<{success: boolean}> {
+  async remove(@Param('id') id: string): Promise<{ success: boolean }> {
     return this.variantService.remove(id);
   }
 
   @Patch(':id/stock')
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(ROLE.ADMIN)
+  @Role(ROLE.ADMIN)
   @ResponseMessage('Cập nhật tồn kho biến thể thành công')
   @ApiOperation({ summary: 'Cập nhật tồn kho biến thể' })
   @ApiResponse({ status: 200, description: 'Tồn kho biến thể đã được cập nhật' })

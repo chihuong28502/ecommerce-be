@@ -12,19 +12,19 @@ import {
 } from '@nestjs/common';
 import { Public } from '../common/decorators/public.decorator';
 import { ResponseMessage } from '../common/decorators/response.decorator';
-import { Roles } from '../common/decorators/roles.decorator';
+import { Role } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
+import { RoleGuard } from '../common/guards/roles.guard';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 
 @Controller('categories')
+@UseGuards(JwtAuthGuard, RoleGuard)
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) { }
 
   @Post()
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(ROLE.ADMIN)
+  @Role(ROLE.ADMIN)
   @ResponseMessage('Tạo danh mục thành công')
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
@@ -87,16 +87,14 @@ export class CategoryController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(ROLE.ADMIN)
+  @Role(ROLE.ADMIN)
   @ResponseMessage('Cập nhật danh mục thành công')
   update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoryService.update(id, updateCategoryDto);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(ROLE.ADMIN)
+  @Role(ROLE.ADMIN)
   @ResponseMessage('Xóa danh mục thành công')
   remove(@Param('id') id: string): Promise<{ success: boolean }> {
     return this.categoryService.remove(id);
