@@ -1,6 +1,7 @@
 import { Public } from '@/common/decorators/public.decorator';
 import { ResponseMessage } from '@/common/decorators/response.decorator';
-import { Body, ConflictException, Controller, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { UsersService } from '@/user/user.service';
+import { Body, ConflictException, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -20,7 +21,11 @@ export class AuthController {
     path: '/',
   } as const;
 
-  constructor(private readonly authService: AuthService) { }
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UsersService
+
+  ) { }
 
   private setRefreshTokenCookie(res: Response, token: string): void {
     res.cookie('refreshToken', token, this.COOKIE_CONFIG);
@@ -65,19 +70,13 @@ export class AuthController {
   async register(
     @Body() registerDto: RegisterDto,
     @Res({ passthrough: true }) res: Response
-  ): Promise<LoginResponse> {
-    const existingUser = await this.authService.findByEmail(registerDto.email);
+  ): Promise<any> {
+    const existingUser = await this.authService.findByEmailByRegister(registerDto.email);
 
     if (existingUser) {
       throw new ConflictException('Email đã tồn tại trong hệ thống');
     }
-
-    const newUser = await this.authService.register(registerDto);
-    const { accessToken, refreshToken, user } = await this.authService.login(newUser);
-
-    this.setRefreshTokenCookie(res, refreshToken);
-
-    return { accessToken, user };
+    return await this.authService.register(registerDto);
   }
 
   @Public()
@@ -85,5 +84,12 @@ export class AuthController {
   async refreshToken(@Req() req: any): Promise<any> {
     const token = req.cookies['refreshToken'];
     return this.authService.refreshToken(token);
+  }
+
+  @Get('verify-email')
+  @HttpCode(HttpStatus.OK)
+  async activeAccountByEmail(@Query('token') token: string) {
+    const verifiedEmail = this.authService.verifyToken(token);
+    return await this.userService.activateAccount(verifiedEmail.email);
   }
 }

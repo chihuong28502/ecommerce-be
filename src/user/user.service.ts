@@ -1,43 +1,63 @@
-import { Role } from '@/common/enums/role.enum';
+import { ROLE } from '@/common/enums/role.enum';
 import {
-    BadRequestException,
-    ConflictException,
-    Injectable,
-    InternalServerErrorException,
-    NotFoundException
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  OnModuleInit
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
+
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnModuleInit {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>
   ) { }
+  async onModuleInit() {
+    await this.ensureAdminUser();
+  }
 
+  private async ensureAdminUser() {
+    try {
+      const adminExists = await this.userModel.findOne({
+        role: ROLE.ADMIN,
+      });
+      if (!adminExists) {
+        const hashedPassword = await bcrypt.hash('123456', 10);
+
+        await this.userModel.create({
+          email: 'admin@gmail.com',
+          password: hashedPassword,
+          firstName: 'Admin',
+          lastName: '',
+          role: ROLE.ADMIN,
+          isActive: true,
+        });
+
+        console.log('Admin user created successfully');
+      } else {
+        console.log('Admin user already exists');
+      }
+    } catch (error) {
+      console.error('Error ensuring admin user:', error);
+    }
+  }
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     try {
       // Validate input
       if (!createUserDto.email) {
         throw new BadRequestException('Email không được để trống');
       }
-
-      // Kiểm tra email tồn tại
-      const existingUser = await this.userModel.findOne({
-        email: createUserDto.email
-      });
-
-      if (existingUser) {
-        throw new ConflictException('Email đã tồn tại trong hệ thống');
-      }
-
       // Tạo user mới
       const newUser = new this.userModel({
         ...createUserDto,
-        roles: [Role.USER] // Default role
+        role: ROLE.USER
       });
 
       return await newUser.save();
@@ -152,7 +172,6 @@ export class UsersService {
     }
   }
 
-
   async changePassword(id: string, oldPassword: string, newPassword: string): Promise<void> {
     try {
       if (!id || !oldPassword || !newPassword) {
@@ -181,18 +200,16 @@ export class UsersService {
     }
   }
 
-  async addRole(id: string, role: Role): Promise<UserDocument> {
+  async updateRole(id: string, role: ROLE): Promise<UserDocument> {
     try {
       if (!id || !role) {
         throw new BadRequestException('Thiếu thông tin cần thiết');
       }
-
       const user = await this.findById(id);
-      if (!user.roles.includes(role)) {
-        user.roles.push(role);
-        return await user.save();
-      }
-      return user;
+      if (!user) { throw new NotFoundException('Không tìm thấy người dùng') }
+      user.role = role;
+      const newUser = await user.save();
+      return newUser;
     } catch (error) {
       if (error instanceof BadRequestException ||
         error instanceof NotFoundException) {
@@ -202,21 +219,18 @@ export class UsersService {
     }
   }
 
-  async removeRole(id: string, role: Role): Promise<UserDocument> {
-    try {
-      if (!id || !role) {
-        throw new BadRequestException('Thiếu thông tin cần thiết');
-      }
+  async filterPassword(user) : Promise<UserDocument> {
+    const userObject = user.toObject()
+    const { password, ...filteredUser } = userObject
+    return filteredUser
+  }
 
-      const user = await this.findById(id);
-      user.roles = user.roles.filter(r => r !== role);
-      return await user.save();
-    } catch (error) {
-      if (error instanceof BadRequestException ||
-        error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new InternalServerErrorException('Có lỗi xảy ra khi xóa role');
-    }
+  async activateAccount(email: string) {
+    await this.userModel.findOneAndUpdate({ email }, { isActive: true });
+    return {
+      message: 'Khởi động tài khoản thành công',
+      success: true,
+      data: null
+    };
   }
 }

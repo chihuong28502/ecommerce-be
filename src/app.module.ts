@@ -1,3 +1,4 @@
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -8,16 +9,17 @@ import { ApiKeyModule } from './api-key/api-key.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { GeminiModule } from './gemini/gemini.module';
-import { RedisModule } from './redis/redis.module';
-import { UsersModule } from './user/user.module';
-import { ProductModule } from './product/product.module';
-import { CategoryModule } from './category/category.module';
 import { CartModule } from './cart/cart.module';
-import { ReviewModule } from './review/review.module';
-import { WishlistModule } from './wishlist/wishlist.module';
+import { CategoryModule } from './category/category.module';
+import { GeminiModule } from './gemini/gemini.module';
+import { HealthModule } from './health/health.module';
 import { NotificationModule } from './notification/notification.module';
+import { ProductModule } from './product/product.module';
+import { RedisModule } from './redis/redis.module';
+import { ReviewModule } from './review/review.module';
 import { SettingModule } from './setting/setting.module';
+import { UsersModule } from './user/user.module';
+import { WishlistModule } from './wishlist/wishlist.module';
 
 
 @Module({
@@ -40,10 +42,30 @@ import { SettingModule } from './setting/setting.module';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRATION', '1d'),
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN', '1d'),
         },
       }),
     }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT'),
+          password: configService.get<string>('REDIS_PASSWORD'),
+        }, defaultJobOptions: {
+          attempts: 3,
+          backoff: {
+            type: 'exponential',
+            delay: 5000,
+          },
+          removeOnComplete: true,
+          removeOnFail: true,
+        },
+      }),
+      inject: [ConfigService],
+    }),
+
     RedisModule,
     GeminiModule,
     AuthModule,
@@ -56,8 +78,9 @@ import { SettingModule } from './setting/setting.module';
     WishlistModule,
     NotificationModule,
     SettingModule,
+    HealthModule,
   ],
-  providers: [AppService,],
-  controllers: [AppController],
+  providers: [AppService],
+  controllers: [AppController]
 })
 export class AppModule { }

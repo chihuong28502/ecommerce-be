@@ -1,10 +1,10 @@
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { ResponseMessage } from '@/common/decorators/response.decorator';
 import { Roles } from '@/common/decorators/roles.decorator';
-import { Role } from '@/common/enums/role.enum';
+import { ROLE } from '@/common/enums/role.enum';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { RolesGuard } from '@/common/guards/roles.guard';
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './user.service';
 
 @Controller('users')
@@ -15,13 +15,16 @@ export class UsersController {
   @Get('profile')
   @ResponseMessage('Lấy thông tin profile thành công')
   getProfile(@CurrentUser() user: any) {
-    return user;
+    return this.usersService.filterPassword(user);
   }
 
-  @Get('admin-only')
-  @ResponseMessage('Lấy nội dung admin thành công')
-  @Roles(Role.ADMIN)
-  getAdminOnly() {
-    return { message: 'This is admin only content' };
+  @Get()
+  @Roles(ROLE.ADMIN) // Chỉ admin có thể gọi API này
+  async getUsers(@Query() query: any) {
+    return {
+      statusCode: 200,
+      message: 'Lấy danh sách người dùng thành công',
+      data: await this.usersService.findAll(query),
+    };
   }
 }

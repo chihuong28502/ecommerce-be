@@ -6,17 +6,25 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
+
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 import { UsersService } from '../user/user.service';
 import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
+    // @InjectQueue('send-email')
     private usersService: UsersService,
+    private configService: ConfigService,
     private jwtService: JwtService,
-  ) {}
+    @InjectQueue('send-email')
+    private sendMail: Queue,
+  ) { }
 
   async validateUser(email: string, password: string): Promise<any> {
     try {
@@ -61,7 +69,7 @@ export class AuthService {
       const payload = {
         email: user.email,
         userId: user._id,
-        roles: user.roles,
+        role: user.role,
       };
 
       const accessToken = this.jwtService.sign(payload);
@@ -85,12 +93,11 @@ export class AuthService {
     }
   }
 
-  async findByEmail(email: string) {
+  async findByEmailByRegister(email: string) {
     try {
       if (!email) {
         throw new BadRequestException('Email không được để trống');
       }
-
       const user = await this.usersService.findByEmail(email).catch((error) => {
         if (error instanceof NotFoundException) {
           return null;
@@ -114,13 +121,6 @@ export class AuthService {
       if (!registerDto.email || !registerDto.password) {
         throw new BadRequestException('Email và mật khẩu không được để trống');
       }
-
-      // Kiểm tra email tồn tại
-      const existingUser = await this.findByEmail(registerDto.email);
-      if (existingUser) {
-        throw new ConflictException('Email đã tồn tại trong hệ thống');
-      }
-
       // Hash password
       const hashedPassword = await bcrypt.hash(registerDto.password, 10);
       if (!hashedPassword) {
@@ -128,15 +128,26 @@ export class AuthService {
           'Có lỗi xảy ra khi mã hóa mật khẩu',
         );
       }
-
       // Tạo user mới
       const newUser = await this.usersService.create({
+        ...registerDto,
         email: registerDto.email,
-        password: hashedPassword,
+        password: hashedPassword
       });
 
-      const { password, ...result } = newUser.toObject();
-      return result;
+      const url = this.generateUrlVerificationToken(registerDto.email);
+
+      await this.sendMail.add('register',
+        {
+          email: registerDto.email, verificationUrl: url
+        }, {
+        removeOnComplete: true,
+      });
+      return {
+        message: 'Kiểm tra email để xác minh tài khoản',
+        success: true,
+        data: newUser,
+      };
     } catch (error) {
       if (
         error instanceof BadRequestException ||
@@ -175,7 +186,7 @@ export class AuthService {
       const newAccessToken = this.jwtService.sign({
         email: user.email,
         userId: user._id,
-        roles: user.roles,
+        role: user.role,
       });
 
       return { accessToken: newAccessToken };
@@ -191,6 +202,21 @@ export class AuthService {
       throw new InternalServerErrorException(
         'Có lỗi xảy ra trong quá trình làm mới token',
       );
+    }
+  }
+
+
+  generateUrlVerificationToken(email: string): string {
+    const hostClient = this.configService.get('NEXT_URL_CLIENT') || "http://localhost:4000";
+    const token = this.jwtService.sign({ email });
+    const verificationUrl = `${hostClient}/verify-email?token=${token}`;
+    return verificationUrl;
+  }
+  verifyToken(token: string) {
+    try {
+      return this.jwtService.verify(token);
+    } catch (err) {
+      throw new UnauthorizedException('Hãy thử yêu cầu lại');
     }
   }
 }
