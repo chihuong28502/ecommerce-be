@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
+import { UserDocument } from '@/user/schemas/user.schema';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { UsersService } from '../user/user.service';
@@ -116,7 +117,7 @@ export class AuthService {
     }
   }
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto): Promise<UserDocument> {
     try {
       if (!registerDto.email || !registerDto.password) {
         throw new BadRequestException('Email và mật khẩu không được để trống');
@@ -137,17 +138,9 @@ export class AuthService {
 
       const url = this.generateUrlVerificationToken(registerDto.email);
 
-      await this.sendMail.add('register',
-        {
-          email: registerDto.email, verificationUrl: url
-        }, {
-        removeOnComplete: true,
-      });
-      return {
-        message: 'Kiểm tra email để xác minh tài khoản',
-        success: true,
-        data: newUser,
-      };
+      await this.sendMail.add('register', { email: registerDto.email, verificationUrl: url },
+        { removeOnComplete: true });
+      return newUser.toObject()
     } catch (error) {
       if (
         error instanceof BadRequestException ||

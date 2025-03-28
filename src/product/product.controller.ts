@@ -95,12 +95,12 @@ export class ProductController {
   @ResponseMessage('Xóa sản phẩm thành công')
   @ApiOperation({ summary: 'Xóa sản phẩm' })
   @ApiResponse({ status: 200, description: 'Sản phẩm đã được xóa' })
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) :Promise<void>{
     return this.productService.remove(id);
   }
 
   @Get(":id/products")
-  async getProductsByCategory(@Param("id") id: string) {
+  async getProductsByCategory(@Param("id") id: string):Promise<Product[]> {
     return this.productService.getProductsByCategory(id);
   }
 }

@@ -59,7 +59,7 @@ export class VariantController {
   @ResponseMessage('Xóa biến thể thành công')
   @ApiOperation({ summary: 'Xóa biến thể' })
   @ApiResponse({ status: 200, description: 'Biến thể đã được xóa' })
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string):Promise<void> {
     return this.variantService.remove(id);
   }
 

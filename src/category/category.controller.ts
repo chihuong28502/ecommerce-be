@@ -32,7 +32,7 @@ export class CategoryController {
 
   @Get()
   @Public()
-  @ResponseMessage('Lấy danh sách danh mục thành công')
+  @ResponseMessage('Lấy tất cả danh mục thành công')
   findAll(@Query() query: any) {
     return this.categoryService.findAll(query);
   }

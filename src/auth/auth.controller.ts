@@ -1,5 +1,6 @@
 import { Public } from '@/common/decorators/public.decorator';
 import { ResponseMessage } from '@/common/decorators/response.decorator';
+import { UserDocument } from '@/user/schemas/user.schema';
 import { UsersService } from '@/user/user.service';
 import { Body, ConflictException, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -70,7 +71,7 @@ export class AuthController {
   async register(
     @Body() registerDto: RegisterDto,
     @Res({ passthrough: true }) res: Response
-  ): Promise<any> {
+  ): Promise<UserDocument> {
     const existingUser = await this.authService.findByEmailByRegister(registerDto.email);
 
     if (existingUser) {
@@ -81,12 +82,14 @@ export class AuthController {
 
   @Public()
   @Post('refresh')
+  @ResponseMessage('Làm mới token successfully')
   async refreshToken(@Req() req: any): Promise<any> {
     const token = req.cookies['refreshToken'];
     return this.authService.refreshToken(token);
   }
 
   @Get('verify-email')
+  @ResponseMessage('Xác thực tài khoản thành công')
   @HttpCode(HttpStatus.OK)
   async activeAccountByEmail(@Query('token') token: string) {
     const verifiedEmail = this.authService.verifyToken(token);

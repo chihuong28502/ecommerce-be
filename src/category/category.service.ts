@@ -157,7 +157,7 @@ export class CategoryService {
   }
 
   // Xóa danh mục
-  async remove(id: string): Promise<{ success: boolean; message: string }> {
+  async remove(id: string): Promise<{ success: boolean }> {
     try {
       const category = await this.categoryModel.findById(id).exec();
 
@@ -175,7 +175,7 @@ export class CategoryService {
       // Xóa danh mục
       await this.categoryModel.findByIdAndDelete(id).exec();
 
-      return { success: true, message: 'Xóa danh mục thành công' };
+      return { success: true };
     } catch (error) {
       if (error instanceof BadRequestException || error instanceof NotFoundException) {
         throw error;
