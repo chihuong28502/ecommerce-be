@@ -95,7 +95,7 @@ export class ProductController {
   @ResponseMessage('Xóa sản phẩm thành công')
   @ApiOperation({ summary: 'Xóa sản phẩm' })
   @ApiResponse({ status: 200, description: 'Sản phẩm đã được xóa' })
-  async remove(@Param('id') id: string) :Promise<void>{
+  async remove(@Param('id') id: string) :Promise<{success:boolean}>{
     return this.productService.remove(id);
   }
 

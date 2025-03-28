@@ -173,7 +173,7 @@ export class VariantService {
    * @param id ID biến thể
    * @returns Thông báo xóa
    */
-  async remove(id: string): Promise<void> {
+  async remove(id: string): Promise<{ success: boolean }> {
     const session = await this.variantModel.startSession();
     session.startTransaction();
 
@@ -204,7 +204,7 @@ export class VariantService {
 
       // Commit transaction
       await session.commitTransaction();
-
+      return { success: true };
     } catch (error) {
       // Rollback transaction
       await session.abortTransaction();

@@ -98,7 +98,7 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(ROLE.ADMIN)
   @ResponseMessage('Xóa danh mục thành công')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<{ success: boolean }> {
     return this.categoryService.remove(id);
   }
 }
