@@ -6,16 +6,24 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
+
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 import { UsersService } from '../user/user.service';
 import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
+    // @InjectQueue('send-email')
     private usersService: UsersService,
+    private configService: ConfigService,
     private jwtService: JwtService,
+    @InjectQueue('send-email')
+    private sendMail: Queue,
   ) { }
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -127,8 +135,19 @@ export class AuthService {
         password: hashedPassword
       });
 
-      const { password, ...result } = newUser.toObject();
-      return result;
+      const url = this.generateUrlVerificationToken(registerDto.email);
+
+      await this.sendMail.add('register',
+        {
+          email: registerDto.email, verificationUrl: url
+        }, {
+        removeOnComplete: true,
+      });
+      return {
+        message: 'Kiểm tra email để xác minh tài khoản',
+        success: true,
+        data: newUser,
+      };
     } catch (error) {
       if (
         error instanceof BadRequestException ||
@@ -183,6 +202,21 @@ export class AuthService {
       throw new InternalServerErrorException(
         'Có lỗi xảy ra trong quá trình làm mới token',
       );
+    }
+  }
+
+
+  generateUrlVerificationToken(email: string): string {
+    const hostClient = this.configService.get('NEXT_URL_CLIENT') || "http://localhost:4000";
+    const token = this.jwtService.sign({ email });
+    const verificationUrl = `${hostClient}/verify-email?token=${token}`;
+    return verificationUrl;
+  }
+  verifyToken(token: string) {
+    try {
+      return this.jwtService.verify(token);
+    } catch (err) {
+      throw new UnauthorizedException('Hãy thử yêu cầu lại');
     }
   }
 }

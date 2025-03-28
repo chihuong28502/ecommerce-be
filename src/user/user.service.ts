@@ -8,7 +8,8 @@ import {
   OnModuleInit
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
+
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
@@ -222,5 +223,14 @@ export class UsersService implements OnModuleInit {
     const userObject = user.toObject()
     const { password, ...filteredUser } = userObject
     return filteredUser
+  }
+
+  async activateAccount(email: string) {
+    await this.userModel.findOneAndUpdate({ email }, { isActive: true });
+    return {
+      message: 'Khởi động tài khoản thành công',
+      success: true,
+      data: null
+    };
   }
 }
